@@ -7,7 +7,7 @@ module.exports = function (app) {
   // handle a get request made to /users path
   // and list users when /users link is selected
   app.get("/students", students.requiresLogin, students.list);
-  app.post('/students/new', students.create);
+  app.post('/students/create', students.create);
   app.get("/students/:studentId/courses", students.listCoursesByStudent);
   //
   // Set up the 'users' parameterized routes 

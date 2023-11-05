@@ -60,6 +60,11 @@ module.exports = function () {
     require('../app/routes/index.server.routes.js')(app);
     require('../app/routes/students.server.routes.js')(app);
     require('../app/routes/courses.server.routes.js')(app);
+    require('../app/routes/users.server.routes.js')(app);
+    app.get('/routes', (req, res) => {
+        res.send(app._router.stack.filter(r => r.route)
+            .map(r=> { return {"path":r.route.path, "methods":r.route.methods}}))
+    })
     //The express.static() middleware takes one argument 
     //to determine the location of the static folder
     //Configure static file serving
