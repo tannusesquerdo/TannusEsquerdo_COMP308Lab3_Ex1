@@ -20,7 +20,7 @@ import EnrollCourse from './EnrollCourse';
 //
 // this component is used to list all articles
 const ListCourses = () => {
-  const userId = useSelector(state => state.id)
+  const userId = useSelector(state => state.auth.id)
   const [courses, setCourses] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const apiUrl = `/api/students/${userId}/courses`;
@@ -37,9 +37,11 @@ const ListCourses = () => {
         }).catch((error) => {
           console.log('error in fetchData:', error)
         });
-      };  
-    fetchData();
-  }, []);
+      };
+    if (userId !== null) {
+      fetchData();
+    }
+  }, [userId, apiUrl]);
 
   const updateCourses = (course) => {
     setCourses(prevCourses => [...prevCourses, course]);

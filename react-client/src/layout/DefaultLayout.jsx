@@ -7,19 +7,21 @@ import { useDispatch, useSelector } from 'react-redux';
 const DefaultLayout = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const isAuthenticated = useSelector(state => state.isAuthenticated)
+  const {isAuthenticated} = useSelector(state => state.auth)
 
   const readCookie = async () => {
     try {
       const res = await axios.get('/api/read_cookie');
       if (res.data.screen === 'auth') {
-        dispatch({ type: 'set', isAuthenticated: false, user: null, id: null });
+        dispatch({ type: 'set', auth: { isAuthenticated: false, user: null, id: null }});
       } else {
         dispatch({ 
-          type: 'set', 
-          isAuthenticated: true,
-          user: res.data.student,
-          id: res.data.id
+          type: 'set',
+          auth: {
+            isAuthenticated: true,
+            user: res.data.student,
+            id: res.data.id
+          }
         })
       }
     } catch (e) {

@@ -17,7 +17,7 @@ import {
  } from '@coreui/react';
 
 const EnrollCourse = ({ visible, setVisible, updateCourses }) => {
-  const userId = useSelector(state => state.id);
+  const userId = useSelector(state => state.auth.id);
   const [courses, setCourses] = useState([])
 
   useEffect(() => {
