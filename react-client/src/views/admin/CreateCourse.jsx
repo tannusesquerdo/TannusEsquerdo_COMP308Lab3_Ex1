@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   CCard,
   CCardBody,
@@ -16,14 +16,17 @@ import { toast } from 'react-toastify';
 // this component is used to create a new article
 function CreateCourse(props) {
   let navigate = useNavigate();
+  const location = useLocation();
+  const { course: data, edit } = location?.state || {};
+  const { courseId } = useParams();
   const [course, setCourse] = useState({ 
-    _id: '', 
-    courseCode: '', 
-    courseName: '', 
-    section: '',
-    semester: '',
+    _id: data?._id || '', 
+    courseCode: data?.courseCode || '',  
+    courseName: data?.courseName || '',  
+    section: data?.section || '',
+    semester: data?.semester || '',
   });
-  const apiUrl = "/api/courses"
+  const apiUrl = edit ? `/api/courses/${courseId}` : "/api/courses";
 
   const saveCourse = (e) => {
     e.preventDefault();
@@ -33,12 +36,20 @@ function CreateCourse(props) {
       section: course.section,
       semester: course.semester,
     };
-    //
-    axios.post(apiUrl, data)
-      .then((result) => {
-        toast.success('Course created successfully');
-        navigate('/admin/courses')
-    })
+    
+    if (!edit) {
+      axios.post(apiUrl, data)
+        .then((result) => {
+          toast.success('Course created successfully');
+          navigate('/admin/courses')
+      })
+    } else {
+      axios.put(apiUrl, data)
+        .then((result) => {
+          toast.success('Course edited successfully');
+          navigate('/admin/courses')
+      })
+    }
   };
   //
   const onChange = (e) => {
@@ -51,7 +62,7 @@ function CreateCourse(props) {
       <CCol xs={12}>
         <CCard className="mb-4">
           <CCardHeader>
-            <strong>Create a Course</strong>
+            <strong>{`${edit ? 'Edit' : 'Create'} a Course`}</strong>
           </CCardHeader>
           <CCardBody>
             <CForm onSubmit={saveCourse}>
@@ -73,7 +84,7 @@ function CreateCourse(props) {
               </div>
                             
               <Button variant="primary" type="submit">
-                Save Course
+                {`${edit ? 'Update' : 'Save'} Course`}
               </Button>
             </CForm>
           </CCardBody>

@@ -14,6 +14,7 @@ const routes = [
   { path: '/admin/students/create', name: 'Add Students', element: CreateStudent },
   { path: '/admin/courses', name: 'All Courses', element: AllCourses },
   { path: '/admin/courses/add', name: 'Create Course', element: CreateCourse },
+  { path: '/admin/courses/:courseId/edit', name: 'Edit Course', element: CreateCourse },
 ];
 
 export default routes;

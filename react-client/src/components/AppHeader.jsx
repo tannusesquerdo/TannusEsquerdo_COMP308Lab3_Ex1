@@ -1,5 +1,5 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CContainer,
@@ -12,14 +12,34 @@ import {
   CNavItem,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilBell, cilAccountLogout, cilList, cilMenu } from '@coreui/icons'
+import { cilBell, cilAccountLogout, cilMenu } from '@coreui/icons'
+import axios from 'axios'
 
 import { AppBreadcrumb } from './index'
 import {logoCentennial} from '../assets/brand/centennialcollege_logo.js'
 
 const AppHeader = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const sidebarShow = useSelector((state) => state.sidebarShow)
+  const apiUrl = '/api/signout'
+
+  const handleLogout = async () => {
+    const result = await axios.post(apiUrl)
+    if (result.status === 200) {
+      dispatch({ 
+        type: 'set',
+        auth: {
+          isAuthenticated: false,
+          user: null,
+          id: null,
+          role: null
+        }
+      })
+      navigate('/login', {replace: true})
+    }
+
+  }
 
   return (
     <CHeader position="sticky" className="mb-4">
@@ -42,8 +62,8 @@ const AppHeader = () => {
               <CIcon icon={cilBell} size="lg" />
             </CNavLink>
           </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
+          <CNavItem >
+            <CNavLink href="#" onClick={handleLogout}>
               <CIcon icon={cilAccountLogout} size="lg" />
             </CNavLink>
           </CNavItem>
