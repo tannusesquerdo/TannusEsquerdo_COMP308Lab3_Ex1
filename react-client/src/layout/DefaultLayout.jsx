@@ -10,7 +10,7 @@ const DefaultLayout = () => {
   const dispatch = useDispatch();
   const {isAuthenticated} = useSelector(state => state.auth)
 
-  const { data: isLoggedInData, loading: isLoggedInLoading, error: isLoggedInError } = useQuery(IS_LOGGED_IN);
+  const { data: isLoggedInData, loading: isLoggedInLoading, error: isLoggedInError } = useQuery(IS_LOGGED_IN, { fetchPolicy: 'network-only' });
 
   const setAuthState = (status, data, dispatch) => {
     const authState = status === 'success'
@@ -38,8 +38,8 @@ const DefaultLayout = () => {
   }, [isLoggedInData, dispatch]);
   
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/', { replace: true });
+    if (!isAuthenticated) {
+      navigate('/login', { replace: true });
     }
   }, [isAuthenticated, navigate]);
   

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import {
   CCard,
   CCardBody,
@@ -16,31 +15,34 @@ import {
   CBadge
 } from '@coreui/react'
 import ModalStudents from './ModalStudents';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@apollo/client';
+import { GET_COURSES } from '../../graphql/queries';
 
 
 const ListCourses = () => {
   const [courses, setCourses] = useState([]);
   const [showStudents, setShowStudents] = useState(false);
   const [currentStudents, setCurrentStudents] = useState([]);
-  const apiUrl = `/api/courses`;
   const navigate = useNavigate();
+  const { data, loading, error } = useQuery(GET_COURSES);
 
   useEffect(() => {
     const fetchData = async () => {
-      axios.get(apiUrl)
-        .then(result => {
-          //check if the user has logged in
-          if(result.data.screen !== 'auth')
-          {
-            setCourses(result.data);
+      if(data && !loading && !error) {
+        try {
+          const { courses } = data;
+          if(courses.length > 0) {
+            setCourses(courses);
           }
-        }).catch((error) => {
-          console.log('error in fetchData:', error)
-        });
-      };  
+        }
+        catch (e) {
+          console.log(e);
+        }
+      }
+    }
     fetchData();
-  }, []);
+  }, [data, loading, error]);
 
   const showStudentsModal = (students) => {
     setCurrentStudents(students);
@@ -53,7 +55,7 @@ const ListCourses = () => {
   }
 
   const editCourse = (course) => {
-    navigate(`/admin/courses/${course._id}/edit`, { state: { course, edit: true } });
+    navigate(`/admin/courses/${course.id}/edit`, { state: { course, edit: true } });
   }
 
   return (
@@ -76,7 +78,7 @@ const ListCourses = () => {
               </CTableHead>
               <CTableBody>
                 {courses.map((course) => (
-                  <CTableRow key={course._id}>
+                  <CTableRow key={course.id}>
                     <CTableHeaderCell>{course.courseCode}</CTableHeaderCell>
                     <CTableHeaderCell>{course.courseName}</CTableHeaderCell>
                     <CTableDataCell>{course.section}</CTableDataCell>

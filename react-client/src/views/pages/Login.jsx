@@ -30,7 +30,9 @@ const Login = () => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
 
-  const { data: isLoggedInData, loading: isLoggedInLoading, error: isLoggedInError } = useQuery(IS_LOGGED_IN);
+  const { data: isLoggedInData, loading: isLoggedInLoading, error: isLoggedInError } = useQuery(IS_LOGGED_IN, {
+    fetchPolicy: 'network-only'
+  });
 
   const [loginMutation] = useMutation(LOGIN, {
     variables: { email, password },

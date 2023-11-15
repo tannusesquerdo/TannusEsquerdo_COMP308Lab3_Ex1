@@ -1,5 +1,5 @@
+/* eslint-disable react/prop-types */
 import React, {useEffect, useState} from 'react'
-import axios from 'axios'
 import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { 
@@ -15,37 +15,55 @@ import {
   CTableHeaderCell,
   CTableRow,
  } from '@coreui/react';
+import { useMutation, useQuery } from '@apollo/client';
+import { GET_COURSES } from '../graphql/queries';
+import { ENROLL_COURSE } from '../graphql/mutations';
 
 const EnrollCourse = ({ visible, setVisible, updateCourses }) => {
   const userId = useSelector(state => state.auth.id);
   const [courses, setCourses] = useState([])
+  const { data, loading, error } = useQuery(GET_COURSES);
+  
+  const [enrollCourse] = useMutation(ENROLL_COURSE, {
+    refetchQueries: [
+      {
+        query: GET_COURSES,
+      },
+    ],
+  })
 
   useEffect(() => {
     const fetchData = async () => {
-      axios.get('/api/courses')
-        .then(result => {
-          //check if the user has logged in
-          if(result.data.screen !== 'auth')
-          {
-            setCourses(result.data);
+      if(data && !loading && !error) {
+        try {
+          const { courses } = data;
+          if(courses.length > 0) {
+            const filteredCourses = courses.filter(course => !course.students.map(student => student.id).includes(userId));
+            setCourses(filteredCourses);
           }
-        }).catch((error) => {
-          console.log('error in fetchData:', error)
-        });
-      };  
+        }
+        catch (e) {
+          console.log(e);
+        }
+      }
+    }
     fetchData();
-  }, [])
+  }, [data, loading, error, userId])
 
-  const addCourse = (courseID) => {
-    axios.post(`/api/courses/${courseID}/students/${userId}`)
-      .then((result) => {
-        toast.success('Course added successfully');
-        setVisible(false);
-        updateCourses(result.data);
-      }).catch((error) => {
-        console.log(error);
-        toast.error(error.message);
-      })
+  const addCourse = (courseId) => {
+    enrollCourse({
+      variables: {
+        courseId,
+        studentId: userId
+      }
+    }).then((result) => {
+      toast.success('Course added successfully');
+      setVisible(false);
+      updateCourses(result.data.enrollCourse);
+    }).catch((error) => {
+      console.log(error);
+      toast.error(error.message);
+    })
   }
 
   return (
@@ -61,7 +79,7 @@ const EnrollCourse = ({ visible, setVisible, updateCourses }) => {
           <CModalTitle id="LiveDemoExampleLabel">Enroll Course</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <CTable bordered>
+          <CTable align="middle" bordered>
             <CTableHead color="light">
               <CTableRow>
                 <CTableHeaderCell scope="col">Course Name</CTableHeaderCell>
@@ -70,10 +88,10 @@ const EnrollCourse = ({ visible, setVisible, updateCourses }) => {
             </CTableHead>
             <CTableBody>
               {courses.map((course) => (
-                <CTableRow key={course._id}>
+                <CTableRow key={course.id}>
                   <CTableHeaderCell>{`${course.courseCode} - ${course.courseName}`}</CTableHeaderCell>
                   <CTableHeaderCell>
-                    <CButton color="primary" onClick={() => addCourse(course._id)}>Enroll</CButton>
+                    <CButton color="secondary" onClick={() => addCourse(course.id)}>Enroll</CButton>
                   </CTableHeaderCell>
                 </CTableRow>
               ))}

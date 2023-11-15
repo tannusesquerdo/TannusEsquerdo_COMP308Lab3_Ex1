@@ -1,7 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import ListGroup from 'react-bootstrap/ListGroup';
-import Spinner from 'react-bootstrap/Spinner';
 import {
   CCard,
   CCardBody,
@@ -12,33 +9,30 @@ import {
   CTableBody,
   CTableHead,
   CTableHeaderCell,
-  CTableRow,
-  CTableDataCell,
-  CButton
+  CTableRow
 } from '@coreui/react'
-import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
+import { useQuery } from '@apollo/client';
+import { GET_STUDENTS } from '../../graphql/queries';
 //
 // this component is used to list all articles
-function ListStudents(props) {
-  let navigate = useNavigate();
+function ListStudents() {
   const [students, setStudents] = useState([]);
-  const apiUrl = `/api/students`;
+  const { data, loading, error } = useQuery(GET_STUDENTS);
 
   useEffect(() => {
     const fetchData = async () => {
-      axios.get(apiUrl)
-        .then(result => {
-          //check if the user has logged in
-          if(result.data.screen !== 'auth')
-          {
-            setStudents(result.data);
+      if(data && !loading && !error) {
+        try {
+          const { students } = data;
+          if(students.length > 0) {
+            setStudents(students);
           }
-        }).catch((error) => {
-          console.log('error in fetchData:', error)
-        });
-      };  
+        }
+        catch (e) {
+          console.log(e);
+        }
+      }
+    };  
     fetchData();
   }, []);
 
@@ -60,7 +54,7 @@ function ListStudents(props) {
               </CTableHead>
               <CTableBody>
                 {students.map((student) => (
-                  <CTableRow key={student._id}>
+                  <CTableRow key={student.id}>
                     <CTableHeaderCell>{`#${student.studentNumber}`}</CTableHeaderCell>
                     <CTableHeaderCell>{student.firstName}</CTableHeaderCell>
                     <CTableHeaderCell>{student.lastName}</CTableHeaderCell>
@@ -68,9 +62,6 @@ function ListStudents(props) {
                 ))}
               </CTableBody>
             </CTable>
-            <ListGroup>
-              
-            </ListGroup>
           </CCardBody>
         </CCard>
       </CCol>

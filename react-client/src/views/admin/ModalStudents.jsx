@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { 
   CButton, 
@@ -11,7 +12,6 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
-  CTableDataCell,
  } from '@coreui/react';
 
 function ModalStudents({ visible, setVisible, students }) {
@@ -36,7 +36,7 @@ function ModalStudents({ visible, setVisible, students }) {
             </CTableHead>
             <CTableBody>
               {students.map((student) => (
-                <CTableRow key={student._id}>
+                <CTableRow key={student.id}>
                   <CTableHeaderCell>{`${student.lastName}, ${student.firstName}`}</CTableHeaderCell>
                 </CTableRow>
               ))}

@@ -20,6 +20,23 @@ export const IS_LOGGED_IN = gql`
   }
 `;
 
+export const GET_COURSES = gql`
+  query GetCourses {
+    courses {
+      id
+      courseCode
+      courseName
+      section
+      semester
+      students {
+        id
+        firstName
+        lastName
+      }
+    }
+  }
+`;
+
 export const GET_STUDENT = gql`
   query GetStudent($id: ID!) {
     student(id: $id) {
@@ -35,6 +52,29 @@ export const GET_STUDENT = gql`
         section
         semester
       }
+    }
+  }
+`;
+
+export const GET_STUDENT_COURSES = gql`
+  query GetStudentCourses($id: ID!) {
+    studentCourses(id: $id) {
+      id
+      courseCode
+      courseName
+      section
+      semester
+    }
+  }
+`;
+
+export const GET_STUDENTS = gql`
+  query GetStudents {
+    students {
+      id
+      studentNumber
+      firstName
+      lastName
     }
   }
 `;

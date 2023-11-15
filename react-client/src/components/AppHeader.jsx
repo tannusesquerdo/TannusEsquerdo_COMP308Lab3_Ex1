@@ -13,20 +13,20 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilBell, cilAccountLogout, cilMenu } from '@coreui/icons'
-import axios from 'axios'
 
 import { AppBreadcrumb } from './index'
 import {logoCentennial} from '../assets/brand/centennialcollege_logo.js'
+import { useMutation } from '@apollo/client'
+import { LOG_OUT } from '../graphql/mutations.js'
 
 const AppHeader = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const sidebarShow = useSelector((state) => state.sidebarShow)
-  const apiUrl = '/api/signout'
+  const [logout] = useMutation(LOG_OUT);
 
   const handleLogout = async () => {
-    const result = await axios.post(apiUrl)
-    if (result.status === 200) {
+    logout().then(() => {
       dispatch({ 
         type: 'set',
         auth: {
@@ -37,7 +37,9 @@ const AppHeader = () => {
         }
       })
       navigate('/login', {replace: true})
-    }
+    }).catch((error) => {
+      console.log(error)
+    })
 
   }
 

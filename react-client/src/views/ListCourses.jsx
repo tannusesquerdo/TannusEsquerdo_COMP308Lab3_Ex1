@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import {
   CCard,
   CCardBody,
@@ -17,45 +16,69 @@ import {
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import EnrollCourse from './EnrollCourse';
+import { useMutation, useQuery } from '@apollo/client';
+import { GET_STUDENT_COURSES } from '../graphql/queries';
+import { DROP_COURSE } from '../graphql/mutations';
 //
 // this component is used to list all articles
 const ListCourses = () => {
   const userId = useSelector(state => state.auth.id)
   const [courses, setCourses] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const apiUrl = `/api/students/${userId}/courses`;
+  const { data, loading, error } = useQuery(GET_STUDENT_COURSES, {
+    variables: {
+      id: userId
+    },
+    skip: !userId
+  });
+
+  const [dropCourseMutation] = useMutation(DROP_COURSE, {
+    variables: {
+      studentId: userId,
+      courseId: ''
+    },
+    refetchQueries: {
+      query: GET_STUDENT_COURSES,
+      variables: {
+        id: userId
+      }
+    }
+  })
 
   useEffect(() => {
     const fetchData = async () => {
-      axios.get(apiUrl)
-        .then(result => {
-          //check if the user has logged in
-          if(result.data.screen !== 'auth')
-          {
-            setCourses(result.data);
+      if(data && !loading && !error) {
+        try {
+          const { studentCourses } = data;
+          if(studentCourses.length > 0) {
+            setCourses(studentCourses);
           }
-        }).catch((error) => {
-          console.log('error in fetchData:', error)
-        });
-      };
-    if (userId !== null) {
-      fetchData();
+        }
+        catch (e) {
+          console.log(e);
+        }
+      }
     }
-  }, [userId, apiUrl]);
+    fetchData();
+  }, [data, loading, error]);
+  
 
   const updateCourses = (course) => {
     setCourses(prevCourses => [...prevCourses, course]);
   }
 
   const dropCourse = (courseID) => {
-    axios.delete(`/api/courses/${courseID}/students/${userId}`)
-      .then((result) => {
-        setCourses(prevCourses => prevCourses.filter(courses => courses._id !== courseID));
-        toast.success('Course dropped successfully');
-      }).catch((error) => {
-        console.log(error);
-        toast.error(error.message);
-      })
+    dropCourseMutation({
+      variables: {
+        courseId: courseID
+      }
+    }).then(() => {
+      toast.success('Course dropped successfully');
+      setCourses(prevCourses => prevCourses.filter(courses => courses.id !== courseID));
+    }).catch((error) => {
+      console.log(error);
+      toast.error(error.message);
+    })
   }
 
   return (
@@ -82,13 +105,13 @@ const ListCourses = () => {
               </CTableHead>
               <CTableBody>
                 {courses.map((course) => (
-                  <CTableRow key={course._id}>
+                  <CTableRow key={course.id}>
                     <CTableHeaderCell>{course.courseCode}</CTableHeaderCell>
                     <CTableHeaderCell>{course.courseName}</CTableHeaderCell>
                     <CTableDataCell>{course.section}</CTableDataCell>
                     <CTableDataCell>{course.semester}</CTableDataCell>
                     <CTableDataCell>
-                      <CButton size='sm' color="danger" onClick={() => dropCourse(course._id)}>Drop Course</CButton>
+                      <CButton size='sm' color="danger" onClick={() => dropCourse(course.id)}>Drop Course</CButton>
                     </CTableDataCell>
                 </CTableRow>
                 ))}
