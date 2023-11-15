@@ -4,6 +4,7 @@ import {
   createBrowserRouter
 } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
+import { ApolloProvider, ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import './scss/style.scss'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -35,12 +36,43 @@ const router = createBrowserRouter([
   },
 ]);
 
+const cache = new InMemoryCache({
+  typePolicies: {
+    Query: {
+      fields: {
+        students: {
+          merge(existing, incoming) {
+            return incoming;
+          },
+        },
+        courses: {
+          merge(existing, incoming) {
+            return incoming;
+          },
+        },
+      },
+    },
+  },
+});
+
+const link = createHttpLink({
+  uri: 'http://localhost:5000/graphql',
+  credentials: 'include'
+});
+
+const client = new ApolloClient({
+  cache,
+  link
+});
+
 function App() {
   return (
-    <Suspense fallback={loading}>
-      <RouterProvider router={router} />
-      <ToastContainer />
-    </Suspense>
+    <ApolloProvider client={client}>
+      <Suspense fallback={loading}>
+        <RouterProvider router={router} />
+        <ToastContainer />
+      </Suspense>
+    </ApolloProvider>
   );
 }
 

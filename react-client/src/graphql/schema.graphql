@@ -1,0 +1,39 @@
+schema {
+  query: RootQueryType
+  mutation: Mutation
+}
+
+type Course {
+  _id: ID
+  courseCode: String
+  courseName: String
+  section: String
+  semester: String
+  students: [Student]
+}
+
+type Mutation {
+  addStudent(studentNumber: String, firstName: String, lastName: String, email: String, phone: String, password: String, favoriteTopic: String, strongestTechnicalSkill: String): Student
+  deleteStudent(id: ID): Student
+}
+
+type RootQueryType {
+  student(id: ID): Student
+  course(id: ID): Course
+  students: [Student]
+  courses: [Course]
+}
+
+type Student {
+  _id: ID
+  studentNumber: String
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  password: String
+  favoriteTopic: String
+  strongestTechnicalSkill: String
+  courses: [Course]
+}
+

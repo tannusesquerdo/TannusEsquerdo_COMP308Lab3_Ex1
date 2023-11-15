@@ -15,9 +15,11 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
+import { useMutation, useQuery } from "@apollo/client";
+import { LOGIN } from '../../graphql/mutations';
+import { IS_LOGGED_IN } from '../../graphql/queries';
 
 //
 // this is the login component
@@ -27,70 +29,73 @@ const Login = () => {
   const {isAuthenticated} = useSelector(state => state.auth)
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
-  const apiUrl = "/api/signin";
+
+  const { data: isLoggedInData, loading: isLoggedInLoading, error: isLoggedInError } = useQuery(IS_LOGGED_IN);
+
+  const [loginMutation] = useMutation(LOGIN, {
+    variables: { email, password },
+  });
 
   const authenticateUser = async () => {
     try {
-      const loginData = { auth: { email, password } }
-      const res = await axios.post(apiUrl, loginData);
-      if (res.data.status === "error") {
-        toast.error(res.data.message);
+      const res = await loginMutation();
+      const { login: { data, message, status } } = res.data;
+      if (status === "error") {
+        toast.error(message);
         return false;
       }
-      if (res.data.screen !== 'auth') {
-        dispatch({ 
-          type: 'set',
-          auth: {
-            isAuthenticated: true,
-            user: res.data.student,
-            role: 'student',
-          }
-        })
-      }
+      setAuthState(status, data, dispatch);
     } catch (e) {
       console.log(e);
     }
-  
-  };
-  
-  //check if the user already logged-in
-  const readCookie = async () => {
-    try {
-      const res = await axios.get('/api/read_cookie');
-      if (res.data.screen !== 'auth') {
-        dispatch({ 
-          type: 'set',
-          auth: {
-            isAuthenticated: true,
-            id: res.data.id,
-            role: 'student'
-          }
-        })
-      } else {
-        dispatch({ 
-          type: 'set',
-          auth: {
-            isAuthenticated: false,
-            user: null,
-            id: null,
-            role: null
-          }
-        })
-      }
-    } catch (e) {
-      dispatch({ type: 'set', auth: { isAuthenticated: false, user: null, id: null }})
-    }
-  };
+  }
 
+  const setAuthState = (status, data, dispatch) => {
+    const authState = status === 'success'
+      ? {
+          isAuthenticated: true,
+          id: data.id,
+          user: data.student,
+          role: 'student'
+        }
+      : {
+          isAuthenticated: false,
+          user: null,
+          id: null,
+          role: null
+        };
+  
+    dispatch({ type: 'set', auth: authState });
+  };
+  
   useEffect(() => {
-    if(isAuthenticated) {
+    if (isLoggedInData) {
+      const { isLoggedIn: { data, status } } = isLoggedInData;
+      setAuthState(status, data, dispatch);
+    }
+  }, [isLoggedInData, dispatch]);
+  
+  useEffect(() => {
+    if (isAuthenticated) {
       navigate('/', { replace: true });
     }
-  }, [isAuthenticated, navigate])
+  }, [isAuthenticated, navigate]);
   
   useEffect(() => {
+    // Check if the user is already logged in
+    const readCookie = async () => {
+      if (!isLoggedInData && !isLoggedInLoading && !isLoggedInError) {
+        try {
+          const { isLoggedIn: { data, status } } = isLoggedInData;
+          setAuthState(status, data, dispatch);
+        } catch (e) {
+          dispatch({ type: 'set', auth: { isAuthenticated: false, user: null, id: null }});
+        }
+      }
+    };
+  
     readCookie();
-  }, []);
+  }, [isLoggedInData, isLoggedInLoading, isLoggedInError, dispatch]); 
 
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">

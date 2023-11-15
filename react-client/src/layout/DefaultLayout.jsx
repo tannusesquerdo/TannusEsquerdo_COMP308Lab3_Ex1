@@ -1,43 +1,63 @@
 import React, { useEffect } from 'react'
 import { AppContent, AppFooter, AppSidebar, AppHeader } from '../components/index'
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
+import { useQuery } from "@apollo/client";
+import { IS_LOGGED_IN } from '../graphql/queries';
 
 const DefaultLayout = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {isAuthenticated} = useSelector(state => state.auth)
 
-  const readCookie = async () => {
-    try {
-      const res = await axios.get('/api/read_cookie');
-      if (res.data.screen === 'auth') {
-        dispatch({ type: 'set', auth: { isAuthenticated: false, user: null, id: null }});
-      } else {
-        dispatch({ 
-          type: 'set',
-          auth: {
-            isAuthenticated: true,
-            user: res.data.student,
-            id: res.data.id
-          }
-        })
-      }
-    } catch (e) {
-      navigate('/login')
-    }
-  };
+  const { data: isLoggedInData, loading: isLoggedInLoading, error: isLoggedInError } = useQuery(IS_LOGGED_IN);
 
+  const setAuthState = (status, data, dispatch) => {
+    const authState = status === 'success'
+      ? {
+          isAuthenticated: true,
+          id: data.id,
+          user: data.student,
+          role: 'student'
+        }
+      : {
+          isAuthenticated: false,
+          user: null,
+          id: null,
+          role: null
+        };
+  
+    dispatch({ type: 'set', auth: authState });
+  };
+  
   useEffect(() => {
-    if(!isAuthenticated) {
-      navigate('/login', { replace: true })
+    if (isLoggedInData) {
+      const { isLoggedIn: { data, status } } = isLoggedInData;
+      setAuthState(status, data, dispatch);
+    }
+  }, [isLoggedInData, dispatch]);
+  
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
     }
   }, [isAuthenticated, navigate]);
-
+  
   useEffect(() => {
+    // Check if the user is already logged in
+    const readCookie = async () => {
+      if (!isLoggedInData && !isLoggedInLoading && !isLoggedInError) {
+        try {
+          const { isLoggedIn: { data, status } } = isLoggedInData;
+          setAuthState(status, data, dispatch);
+        } catch (e) {
+          dispatch({ type: 'set', auth: { isAuthenticated: false, user: null, id: null }});
+        }
+      }
+    };
+  
     readCookie();
-  },[])
+  }, [isLoggedInData, isLoggedInLoading, isLoggedInError, dispatch]);
 
   return (
     <div>

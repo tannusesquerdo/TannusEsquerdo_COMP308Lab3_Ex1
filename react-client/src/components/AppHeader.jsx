@@ -54,7 +54,7 @@ const AppHeader = () => {
           <CIcon icon={logoCentennial} height={48} alt="Logo" />
         </CHeaderBrand>
         <CHeaderNav className="d-none d-md-flex me-auto">
-          <CNavLink href="#">COMP 308 - Lab #2</CNavLink>
+          <CNavLink href="#">COMP 308 - Lab #3</CNavLink>
         </CHeaderNav>
         <CHeaderNav>
           <CNavItem>
