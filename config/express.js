@@ -1,10 +1,10 @@
-﻿//express.js file is where we configure our Express application
-//
-// Load the module dependencies
-var config = require("./config"),
-  express = require("express"),
-  morgan = require("morgan"),
-  compress = require("compression");
+﻿const config = require("./config");
+const express = require("express");
+const morgan = require("morgan");
+const compress = require("compression");
+const bodyParser = require("body-parser");
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const { graphqlHTTP } = require("express-graphql");
 const schema = require("./../app/schema/schema");
@@ -22,16 +22,52 @@ module.exports = function () {
     app.use(compress());
   }
 
-  app.use(cors());
+  const corsOptions = {
+    origin: ["http://localhost:5173", "http://localhost:3000"],
+    credentials: true,
+  };
+
+  app.use(cors(corsOptions));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
   app.use(
+    bodyParser.urlencoded({
+      extended: true,
+    })
+  );
+  app.use(bodyParser.json());
+  //
+  app.use(cookieParser());
+
+  app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:5173");
+    res.header("Access-Control-Allow-Credentials", true);
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    next();
+  });
+
+  app.use(
+    session({
+      saveUninitialized: true,
+      resave: true,
+      secret: config.sessionSecret,
+    })
+  );
+
+  app.use(
     "/graphql",
-    graphqlHTTP({
+    graphqlHTTP((request, response) => ({
       schema,
       graphiql: process.env.NODE_ENV === "development",
-    })
+      context: {
+        req: request,
+        res: response,
+      },
+    }))
   );
 
   return app;
