@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   CCard,
   CCardBody,
@@ -13,20 +12,32 @@ import {
   CFormLabel
 } from '@coreui/react'
 import { toast } from 'react-toastify';
+import { useMutation } from '@apollo/client';
+import { ADD_COURSE, UPDATE_COURSE } from '../../graphql/mutations';
+import { GET_COURSES } from '../../graphql/queries';
 // this component is used to create a new article
-function CreateCourse(props) {
+function CreateCourse() {
   let navigate = useNavigate();
   const location = useLocation();
   const { course: data, edit } = location?.state || {};
-  const { courseId } = useParams();
   const [course, setCourse] = useState({ 
-    _id: data?._id || '', 
+    id: data?.id || '', 
     courseCode: data?.courseCode || '',  
     courseName: data?.courseName || '',  
     section: data?.section || '',
     semester: data?.semester || '',
   });
-  const apiUrl = edit ? `/api/courses/${courseId}` : "/api/courses";
+  const [addCourseMutation] = useMutation(ADD_COURSE, {
+    refetchQueries: {
+      query: GET_COURSES
+    }
+  });
+
+  const [updateCourseMutation] = useMutation(UPDATE_COURSE, {
+    refetchQueries: {
+      query: GET_COURSES
+    }
+  });
 
   const saveCourse = (e) => {
     e.preventDefault();
@@ -38,16 +49,18 @@ function CreateCourse(props) {
     };
     
     if (!edit) {
-      axios.post(apiUrl, data)
-        .then((result) => {
-          toast.success('Course created successfully');
-          navigate('/admin/courses')
-      })
+      addCourseMutation({
+        variables: { ...data },
+      }).then(() => {
+        toast.success('Course added successfully');
+        navigate('/admin/courses')
+      });
     } else {
-      axios.put(apiUrl, data)
-        .then((result) => {
-          toast.success('Course edited successfully');
-          navigate('/admin/courses')
+      updateCourseMutation({
+        variables: { ...data, id: course.id },
+      }).then(() => {
+        toast.success('Course edited successfully');
+        navigate('/admin/courses')
       })
     }
   };

@@ -38,6 +38,18 @@ export const ADD_COURSE = gql`
   }
 `;
 
+export const UPDATE_COURSE = gql`
+  mutation UpdateCourse($id: ID!, $courseCode: String!, $courseName: String!, $section: String!, $semester: String!) {
+    updateCourse(id: $id, courseCode: $courseCode, courseName: $courseName, section: $section, semester: $semester) {
+      id
+      courseCode
+      courseName
+      section
+      semester
+    }
+  }
+`;
+
 export const ENROLL_COURSE = gql`
   mutation EnrollCourse($studentId: ID!, $courseId: ID!) {
     enrollCourse(studentId: $studentId, courseId: $courseId) {

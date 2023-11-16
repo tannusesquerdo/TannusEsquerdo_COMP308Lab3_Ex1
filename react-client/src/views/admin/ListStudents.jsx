@@ -34,7 +34,7 @@ function ListStudents() {
       }
     };  
     fetchData();
-  }, []);
+  }, [data, loading, error]);
 
   return (
     <CRow>
