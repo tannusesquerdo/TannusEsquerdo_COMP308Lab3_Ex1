@@ -25,11 +25,12 @@ const StudentType = new GraphQLObjectType({
     studentNumber: { type: GraphQLString },
     firstName: { type: GraphQLString },
     lastName: { type: GraphQLString },
+    address: { type: GraphQLString },
+    city: { type: GraphQLString },
+    program: { type: GraphQLString },
     email: { type: GraphQLString },
     phone: { type: GraphQLString },
     password: { type: GraphQLString },
-    favoriteTopic: { type: GraphQLString },
-    strongestTechnicalSkill: { type: GraphQLString },
     courses: {
       type: new GraphQLList(CourseType),
       resolve(parent, args) {

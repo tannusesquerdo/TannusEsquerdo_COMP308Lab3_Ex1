@@ -8,13 +8,15 @@ const StudentSchema = new Schema({
   studentNumber: Number,
   firstName: String,
   lastName: String,
-  phone: String,
+  address: String,
+  city: String,
   program: String,
   email: {
     type: String,
     match: [/.+\@.+\..+/, "Please fill a valid email address"],
     unique: true,
   },
+  phone: String,
   password: {
     type: String,
     validate: [
@@ -22,8 +24,6 @@ const StudentSchema = new Schema({
       "Password should be longer",
     ],
   },
-  favoriteTopic: String,
-  strongestTechnicalSkill: String,
   courses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
 });
 

@@ -5,9 +5,11 @@ const ListCourses = React.lazy(() => import('./views/ListCourses'));
 const CreateCourse = React.lazy(() => import('./views/admin/CreateCourse'));
 const ListStudents = React.lazy(() => import('./views/admin/ListStudents'));
 const AllCourses = React.lazy(() => import('./views/admin/ListCourses'));
+const CreateStudentPub = React.lazy(() => import('./views/CreateStudent'));
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
+  { path: '/register', name: 'Signup', element: CreateStudentPub },
   { path: '/courses', name: 'Courses', element: ListCourses },
   { path: '/courses/my', name: 'My Courses', exact: true, element: ListCourses },
   { path: '/admin/students/', name: 'All Students', element: ListStudents },
