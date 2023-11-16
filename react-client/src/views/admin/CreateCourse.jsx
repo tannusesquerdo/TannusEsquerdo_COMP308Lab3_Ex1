@@ -28,15 +28,23 @@ function CreateCourse() {
     semester: data?.semester || '',
   });
   const [addCourseMutation] = useMutation(ADD_COURSE, {
-    refetchQueries: {
-      query: GET_COURSES
-    }
+    update(cache, { data: { addCourse } }) {
+      const { courses } = cache.readQuery({ query: GET_COURSES });
+      cache.writeQuery({
+        query: GET_COURSES,
+        data: { courses: [...courses, addCourse] },
+      });
+    },
   });
 
   const [updateCourseMutation] = useMutation(UPDATE_COURSE, {
-    refetchQueries: {
-      query: GET_COURSES
-    }
+    update(cache, { data: { updateCourse } }) {
+      const { courses } = cache.readQuery({ query: GET_COURSES });
+      cache.writeQuery({
+        query: GET_COURSES,
+        data: { courses: [...courses.filter(course => course.id !== updateCourse.id), updateCourse] },
+      });
+    },
   });
 
   const saveCourse = (e) => {

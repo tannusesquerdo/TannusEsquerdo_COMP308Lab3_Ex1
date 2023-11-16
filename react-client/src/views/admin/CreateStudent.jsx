@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -13,10 +12,12 @@ import {
   CFormInput
 } from '@coreui/react'
 import { toast } from 'react-toastify';
+import { useMutation } from '@apollo/client';
+import { ADD_STUDENT } from '../../graphql/mutations';
+import { GET_STUDENTS } from '../../graphql/queries';
 
 const CreateStudent = () => {
   let navigate = useNavigate()
-  //
   const [user, setUser] = useState({ 
     studentNumber: '', 
     firstName: '', 
@@ -24,7 +25,15 @@ const CreateStudent = () => {
     email: '',
     password: '' 
   });
-  const apiUrl = '/api/students/create';
+  const [addStudentMutation] = useMutation(ADD_STUDENT, {
+    update(cache, { data: { addStudent } }) {
+      const { students } = cache.readQuery({ query: GET_STUDENTS });
+      cache.writeQuery({
+        query: GET_STUDENTS,
+        data: { students: [...students, addStudent] },
+      });
+    },
+  })
 
   const saveUser = (e) => {
     e.preventDefault();
@@ -35,14 +44,16 @@ const CreateStudent = () => {
       email: user.email,
       password: user.password
     };
-      //use promises
-      axios.post(apiUrl, data)
-        .then((result) => {
-          toast.success('Student created successfully');
-          navigate('/admin/students')
-        })
-        .catch((error) => setShowLoading(false));
+    
+    addStudentMutation({
+      variables: { ...data },
+    }).then(() => {
+      toast.success('Student created successfully');
+      navigate('/admin/students')
+    })
+    .catch(() => console.log('Error'));
   };
+
   // handles onChange event
   const onChange = (e) => {
     e.persist();
