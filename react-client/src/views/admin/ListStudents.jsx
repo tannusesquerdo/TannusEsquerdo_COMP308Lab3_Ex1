@@ -13,6 +13,7 @@ import {
 } from '@coreui/react'
 import { useQuery } from '@apollo/client';
 import { GET_STUDENTS } from '../../graphql/queries';
+import { Link } from 'react-router-dom'; 
 //
 // this component is used to list all articles
 function ListStudents() {
@@ -50,6 +51,7 @@ function ListStudents() {
                 <CTableHeaderCell scope="col">#ID</CTableHeaderCell>
                 <CTableHeaderCell scope="col">First Name</CTableHeaderCell>
                 <CTableHeaderCell scope="col">Last Name</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Action</CTableHeaderCell>
               </CTableRow>
               </CTableHead>
               <CTableBody>
@@ -58,6 +60,9 @@ function ListStudents() {
                     <CTableHeaderCell>{`#${student.studentNumber}`}</CTableHeaderCell>
                     <CTableHeaderCell>{student.firstName}</CTableHeaderCell>
                     <CTableHeaderCell>{student.lastName}</CTableHeaderCell>
+                    <CTableHeaderCell>
+                      <Link to={`/admin/students/${student.id}/edit`}>Edit</Link>
+                    </CTableHeaderCell>
                   </CTableRow>
                 ))}
               </CTableBody>
