@@ -44,7 +44,12 @@ export const GET_STUDENT = gql`
       studentNumber
       firstName
       lastName
+      phone
+      program
       email
+      password
+      favoriteTopic
+      strongestTechnicalSkill
       courses {
         id
         courseCode

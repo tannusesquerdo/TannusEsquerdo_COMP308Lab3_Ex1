@@ -21,9 +21,13 @@ const CreateStudent = () => {
   const [user, setUser] = useState({ 
     studentNumber: '', 
     firstName: '', 
-    lastName: '', 
+    lastName: '',
+    phone: '',
+    program: '', 
     email: '',
-    password: '' 
+    password: '',
+    favoriteTopic: '',
+    strongestTechnicalSkill: '' 
   });
   const [addStudentMutation] = useMutation(ADD_STUDENT, {
     update(cache, { data: { addStudent } }) {
@@ -41,8 +45,12 @@ const CreateStudent = () => {
       studentNumber: user.studentNumber,
       firstName: user.firstName,
       lastName: user.lastName,
+      phone: user.phone,
+      program: user.program,
       email: user.email,
-      password: user.password
+      password: user.password,
+      favoriteTopic: user.favoriteTopic,
+      strongestTechnicalSkill: user.strongestTechnicalSkill
     };
     
     addStudentMutation({
@@ -83,12 +91,28 @@ const CreateStudent = () => {
                 <CFormInput type="text" name="lastName" id="lastName" placeholder="Enter last name" value={user.lastName} onChange={onChange} />
               </div>
               <div className="mb-3">
+                <CFormLabel htmlFor='phone'> Phone</CFormLabel>
+                <CFormInput type="text" name="phone" id="phone" placeholder="Enter phone" value={user.phone} onChange={onChange} />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor='program'> Program</CFormLabel>
+                <CFormInput type="text" name="program" id="program" placeholder="Enter program" value={user.program} onChange={onChange} />
+              </div>
+              <div className="mb-3">
                 <CFormLabel htmlFor='email'>Email</CFormLabel>
                 <CFormInput type="text" name="email" id="email" rows="3" placeholder="Enter email" value={user.email} onChange={onChange} />
               </div>
               <div className="mb-3">
                 <CFormLabel htmlFor='password'>Password</CFormLabel>
                 <CFormInput type="password" name="password" id="password" placeholder="Enter password" value={user.password} onChange={onChange} />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor='favoriteTopic'> Favorite Topic</CFormLabel>
+                <CFormInput type="text" name="favoriteTopic" id="favoriteTopic" placeholder="Enter favorite topic" value={user.favoriteTopic} onChange={onChange} />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor='strongestTechnicalSkill'> Strongest Techincal Skill</CFormLabel>
+                <CFormInput type="text" name="strongestTechnicalSkill" id="strongestTechnicalSkill" placeholder="Enter strongest Tech skill" value={user.strongestTechnicalSkill} onChange={onChange} />
               </div>
 
               <Button variant="primary" type="submit">

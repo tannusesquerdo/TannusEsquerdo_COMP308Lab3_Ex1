@@ -18,11 +18,15 @@ import { GET_STUDENT } from '../../graphql/queries';
 
 function UpdateStudent(props) {
   const [student, setStudent] = useState([]);
-  const {id} = useParams();
+  const params = useParams();
+  const id = params.studentId;
+  //console.log('in Update Student params= ',params);
+  console.log('in Update Student id= ', id);
   const { data, loading, error } = useQuery(GET_STUDENT, {
     variables: { id },
     onCompleted: (data) => {
       const { student } = data;
+      console.log('student= ',student);
       setStudent(student);
     },
   });
@@ -38,6 +42,8 @@ function UpdateStudent(props) {
     
     try {
       console.log('Before updateUser call');
+      console.log('student= ',student);
+      console.log('id= ',id);
       await updateStudentMutation({
         variables: { id, ...student },
       });
@@ -82,8 +88,24 @@ function UpdateStudent(props) {
                 <CFormInput type="text" name="lastName" id="lastName" placeholder="Enter last name" value={student.lastName} onChange={onChange} />
               </div>
               <div className="mb-3">
+                <CFormLabel htmlFor='phone'> Phone</CFormLabel>
+                <CFormInput type="text" name="phone" id="phone" rows="3" placeholder="Enter phone" value={student.phone} onChange={onChange} />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor='program'> Program</CFormLabel>
+                <CFormInput type="text" name="program" id="program" rows="3" placeholder="Enter program" value={student.program} onChange={onChange} />
+              </div>
+              <div className="mb-3">
                 <CFormLabel htmlFor='email'> Email</CFormLabel>
                 <CFormInput type="text" name="email" id="email" rows="3" placeholder="Enter email" value={student.email} onChange={onChange} />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor='favoriteTopic'> Favorite Topic</CFormLabel>
+                <CFormInput type="text" name="favoriteTopic" id="favoriteTopic" rows="3" placeholder="Enter favorite topic" value={student.favoriteTopic} onChange={onChange} />
+              </div>
+              <div className="mb-3">
+                <CFormLabel htmlFor='strongestTechnicalSkill'> Strongest Technical Skill</CFormLabel>
+                <CFormInput type="text" name="strongestTechnicalSkill" id="strongestTechnicalSkill" rows="3" placeholder="Enter strongest tech skill" value={student.strongestTechnicalSkill} onChange={onChange} />
               </div>
 
               <Button variant="primary" type="submit">
