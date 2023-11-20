@@ -41,14 +41,11 @@ function UpdateStudent(props) {
     console.log('in handleSubmit, user=', student);
     
     try {
-      console.log('Before updateUser call');
-      console.log('student= ',student);
-      console.log('id= ',id);
       await updateStudentMutation({
         variables: { id, ...student },
       });
       console.log('After updateUser call', student);
-      navigate('/userlist');
+      navigate('/admin/students');
     } catch (error) {
       console.error('Error updating user:', error);
       // Handle the error as needed (e.g., show an error message to the user)
