@@ -119,6 +119,7 @@ exports.update = function(req, res, next) {
 };
 // delete a student by id
 exports.delete = function(req, res, next) {
+	console.log("in controller delete", req.student);
 	Student.findByIdAndRemove(req.student.id, req.body, function (err, student) {
 		if (err) return next(err);
 		res.json(student);
