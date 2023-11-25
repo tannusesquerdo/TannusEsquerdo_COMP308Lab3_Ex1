@@ -55,7 +55,7 @@ function ListStudents() {
       }
     }).then(() => {
       toast.success('Student removed successfully');
-      //setCourses(prevCourses => prevCourses.filter(courses => courses.id !== courseID));
+      setStudents(prevStudents => prevStudents.filter(students => students.id !== student.id));
     }).catch((error) => {
       console.log(error);
       toast.error(error.message);

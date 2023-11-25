@@ -53,7 +53,7 @@ const deleteStudent = async (root, params) => {
   try {
     console.log("deleteStudent", params);
     const deletedStudent = await Student.findOneAndRemove({
-      id: params.id,
+      _id: params.id,
       //email: params.email,
     }).exec();
 
