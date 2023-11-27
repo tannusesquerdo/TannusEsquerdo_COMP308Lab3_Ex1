@@ -75,17 +75,43 @@ export const DROP_COURSE = gql`
 `;
 
 export const ADD_STUDENT = gql`
-  mutation AddStudent($studentNumber: String!, $firstName: String!, $lastName: String!, $email: String!, $phone: String, $password: String!, $favoriteTopic: String, $strongestTechnicalSkill: String) {
-    addStudent(studentNumber: $studentNumber, firstName: $firstName, lastName: $lastName, email: $email, phone: $phone, password: $password, favoriteTopic: $favoriteTopic, strongestTechnicalSkill: $strongestTechnicalSkill) {
+  mutation AddStudent($studentNumber: String!, $firstName: String!, $lastName: String!, $phone: String!, $program: String!, $email: String!, $password: String!, $favoriteTopic: String!, $strongestTechnicalSkill: String!) {
+    addStudent(studentNumber: $studentNumber, firstName: $firstName, lastName: $lastName, phone: $phone, program: $program, email: $email, password: $password, favoriteTopic: $favoriteTopic, strongestTechnicalSkill: $strongestTechnicalSkill) {
       id
       studentNumber
       firstName
       lastName
-      email
       phone
+      program
+      email
       password
       favoriteTopic
       strongestTechnicalSkill
+    }
+  }
+`;
+
+export const UPDATE_STUDENT = gql`
+  mutation UpdateStudent($id: ID!, $studentNumber: String!, $firstName: String!, $lastName: String!, $email: String!, $phone: String!, $program: String!, $password: String!, $favoriteTopic: String!, $strongestTechnicalSkill: String!) {
+    updateStudent(id: $id, studentNumber: $studentNumber, firstName: $firstName, lastName: $lastName, email: $email, phone: $phone, program: $program, password: $password, favoriteTopic: $favoriteTopic, strongestTechnicalSkill: $strongestTechnicalSkill) {
+      id
+      studentNumber
+      firstName
+      lastName
+      phone
+      program
+      email
+      password
+      favoriteTopic
+      strongestTechnicalSkill
+    }
+  }
+`;
+
+export const DELETE_STUDENT = gql`
+  mutation DeleteStudent($id: ID!) {
+    deleteStudent(id: $id) {
+      id
     }
   }
 `;

@@ -51,12 +51,14 @@ const updateStudent = async (parent, args) => {
 
 const deleteStudent = async (root, params) => {
   try {
+    console.log("deleteStudent", params);
     const deletedStudent = await Student.findOneAndRemove({
-      email: params.email,
+      _id: params.id,
+      //email: params.email,
     }).exec();
 
     if (!deletedStudent) {
-      throw new Error(`Student with email ${params.email} not found`);
+      throw new Error(`Student with id ${params.id} not found`);
     }
 
     return deletedStudent;
